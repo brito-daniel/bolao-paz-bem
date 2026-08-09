@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ContadorRegressivo } from "@/components/ContadorRegressivo";
 import { TabelaPontuacao } from "@/components/TabelaPontuacao";
 import { FormularioIdentificacao } from "@/components/FormularioIdentificacao";
@@ -33,6 +34,10 @@ export default function Home() {
         <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wide">Começar</h2>
         <FormularioIdentificacao />
       </section>
+
+      <Link href="/pitacos" className="self-start text-sm text-slate-500 underline">
+        Ver quem já registrou pitaco
+      </Link>
     </div>
   );
 }

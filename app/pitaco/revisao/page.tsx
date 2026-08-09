@@ -106,6 +106,34 @@ export default function RevisaoPage() {
     setEnviado(true);
   }
 
+  function baixarComprovante() {
+    if (!usuario) return;
+
+    const linhas = ["Cargo;Estado;Candidato;Turno previsto;Ordem do senador"];
+    if (rascunho.presidente) {
+      linhas.push(`Presidente;;${nomeCandidato(rascunho.presidente.candidatoId)};${rascunho.presidente.turno}º turno;`);
+    }
+    for (const uf of estadosEsperados) {
+      const e = rascunho.porEstado[uf];
+      if (!e) continue;
+      if (e.governador) {
+        linhas.push(`Governador;${uf};${nomeCandidato(e.governador.candidatoId)};${e.governador.turno}º turno;`);
+      }
+      if (e.senador1) linhas.push(`Senador;${uf};${nomeCandidato(e.senador1)};;1`);
+      if (e.senador2) linhas.push(`Senador;${uf};${nomeCandidato(e.senador2)};;2`);
+    }
+
+    // BOM no início ajuda o Excel a abrir os acentos corretamente.
+    const conteudo = "﻿" + linhas.join("\n");
+    const blob = new Blob([conteudo], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `pitaco-${usuario.nome.trim().replace(/\s+/g, "-").toLowerCase()}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   if (!usuario) return null;
 
   if (enviado) {
@@ -115,6 +143,12 @@ export default function RevisaoPage() {
         <p className="text-slate-600">
           Seu pitaco foi salvo como definitivo. Valeu, {usuario.nome} — boa sorte no bolão.
         </p>
+        <button
+          onClick={baixarComprovante}
+          className="self-start rounded-md border border-slate-900 px-6 py-2 font-medium text-slate-900"
+        >
+          Baixar comprovante do meu pitaco (CSV)
+        </button>
         <Link href="/" className="self-start rounded-md bg-slate-900 px-6 py-2 font-medium text-white">
           Voltar para a home
         </Link>
