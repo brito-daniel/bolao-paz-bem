@@ -20,7 +20,7 @@ export default function Home() {
           Prazo para registrar seu pitaco
         </h2>
         <ContadorRegressivo />
-        <p className="text-sm text-slate-500">até 10 de setembro de 2026</p>
+        <p className="text-sm text-slate-500">até as 22h do dia 10 de setembro de 2026</p>
       </section>
 
       <section className="flex flex-col gap-3 rounded-lg border border-slate-200 p-5">
