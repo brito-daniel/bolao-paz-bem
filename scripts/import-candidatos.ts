@@ -1,7 +1,8 @@
 /**
- * Importa candidaturas de um CSV no layout do TSE (consulta_cand, separador ';')
- * para a tabela `candidatos`. Roda contra o mock em dev; contra o CSV real do TSE
- * (baixado de dadosabertos.tse.jus.br) assim que ele sair — mesmas colunas.
+ * Importa candidaturas de um CSV no layout do TSE (consulta_cand) para a
+ * tabela `candidatos`. Aceita tanto o ZIP oficial do TSE (';', ISO-8859-1)
+ * quanto exports derivados em UTF-8/vírgula — delimitador e encoding são
+ * detectados automaticamente a partir do cabeçalho.
  *
  * Uso: npx tsx scripts/import-candidatos.ts [caminho-do-csv]
  * Padrão: scripts/mock-candidatos.csv
@@ -29,13 +30,32 @@ interface LinhaTse {
   SG_PARTIDO: string;
 }
 
+function detectarEncoding(caminho: string): "utf-8" | "latin1" {
+  const buffer = readFileSync(caminho);
+  const decoder = new TextDecoder("utf-8", { fatal: true });
+  try {
+    decoder.decode(buffer);
+    return "utf-8";
+  } catch {
+    return "latin1"; // ZIP oficial do TSE vem em ISO-8859-1
+  }
+}
+
+function detectarDelimitador(primeiraLinha: string): ";" | "," {
+  return primeiraLinha.split(";").length >= primeiraLinha.split(",").length ? ";" : ",";
+}
+
 function main() {
   const caminho = process.argv[2] ?? "scripts/mock-candidatos.csv";
-  const conteudo = readFileSync(caminho, "latin1");
+  const encoding = detectarEncoding(caminho);
+  const conteudo = readFileSync(caminho, encoding);
+  const delimiter = detectarDelimitador(conteudo.slice(0, conteudo.indexOf("\n")));
+
+  console.log(`Lendo ${caminho} como ${encoding}, delimitador "${delimiter}".`);
 
   const linhas: LinhaTse[] = parse(conteudo, {
     columns: true,
-    delimiter: ";",
+    delimiter,
     trim: true,
     skip_empty_lines: true,
   });

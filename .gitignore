@@ -37,6 +37,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# dados reais do TSE (candidaturas/resultados) — grandes, públicos e reproduzíveis;
+# o banco de dados é a fonte de verdade, não precisam ficar versionados aqui
+candidatos_*.csv
+resultados_*.csv
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
